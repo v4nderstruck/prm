@@ -18,11 +18,6 @@ export default function Stats() {
           <div className="stat-desc">Last Activity: Yesterday</div>
         </div>
         <div className="stat">
-          <div className="stat-title">Activities</div>
-          <div className="stat-value">4,200</div>
-          <div className="stat-desc">Last Activity: Yesterday</div>
-        </div>
-        <div className="stat">
           <div className="stat-title">Add More</div>
           <div className="stat-value">
             <AiOutlineAppstoreAdd />

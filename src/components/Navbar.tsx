@@ -2,6 +2,7 @@ import { useTheme } from "next-themes";
 import { MdEmojiPeople } from "react-icons/md"
 import { BsMoonStars, BsSun } from "react-icons/bs"
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -15,16 +16,24 @@ export default function Navbar() {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
           </label>
           <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-            <li><a>Contacts</a></li>
-            <li><a>Calendar</a></li>
-            <li><a>Character</a></li>
+            <li>
+              <Link href="/contacts/">Contacts</Link>
+            </li>
+            <li>
+              <a>Calendar</a>
+            </li>
+            <li>
+              <a>Character</a>
+            </li>
           </ul>
         </div>
-        <a className="btn btn-ghost normal-case text-xl">PRM</a>
+        <Link href="/" className="btn btn-ghost normal-case text-xl">PRM</Link>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
-          <li><a>Contacts</a></li>
+          <li>
+            <Link href={"/contacts"}>Contacts</Link>
+          </li>
           <li><a>Calendar</a></li>
           <li><a>Character</a></li>
         </ul>
