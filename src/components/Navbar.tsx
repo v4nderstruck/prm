@@ -1,5 +1,4 @@
 import { useTheme } from "next-themes";
-import { MdEmojiPeople } from "react-icons/md"
 import { BsMoonStars, BsSun } from "react-icons/bs"
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -20,7 +19,7 @@ export default function Navbar() {
               <Link href="/contacts/">Contacts</Link>
             </li>
             <li>
-              <a>Calendar</a>
+              <Link href="/calendar/">Calendar</Link>
             </li>
             <li>
               <a>Character</a>
@@ -32,9 +31,11 @@ export default function Navbar() {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <Link href={"/contacts"}>Contacts</Link>
+            <Link href="/contacts/">Contacts</Link>
           </li>
-          <li><a>Calendar</a></li>
+          <li>
+            <Link href="/calendar/">Calendar</Link>
+          </li>
           <li><a>Character</a></li>
         </ul>
       </div>

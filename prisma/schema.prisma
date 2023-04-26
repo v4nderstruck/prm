@@ -2,65 +2,157 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+  provider = "sqlite"
+  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+  // Further reading:
+  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+  url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Channels {
+  id        String   @id @default(cuid())
+  key       String
+  value     String
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Note {
+  id              String    @id @default(cuid())
+  title           String
+  summary         String
+  note            String
+  noteContactId   Int?
+  noteContact     Contact?  @relation("notes", fields: [noteContactId], references: [id])
+  portraitId      Int?      @unique
+  portraitContact Contact?  @relation("portrait", fields: [portraitId], references: [id])
+  activity        Activity?
+  Tasks           Task?
+  Reminder        Reminder?
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  key       String
+  reason    String
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Dislike {
+  id        String   @id @default(cuid())
+  key       String
+  reason    String
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  Note      Note     @relation(fields: [noteId], references: [id])
+  noteId    String   @unique
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  Note      Note     @relation(fields: [noteId], references: [id])
+  noteId    String   @unique
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  when      DateTime
+  note      Note     @relation(fields: [noteId], references: [id])
+  noteId    String   @unique
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  value     String
+  Contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+}
+
+model Contact {
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  birthday             DateTime?
+  occupation           String?
+  lastContacted        DateTime?
+  lastActivityTogether DateTime?
+  channels             Channels[]
+  firstMet             String?
+  firstMetDate         DateTime?
+
+  likes    Like[]
+  dislikes Dislike[]
+
+  avatar     String?
+  pictures   String?
+  portrait   Note?      @relation("portrait")
+  notes      Note[]     @relation("notes")
+  activities Activity[]
+  tasks      Task[]
+  reminders  Reminder[]
+  tags       Tag[]
+
+  significantId    Int?
+  significant      Contact?  @relation("significant", fields: [significantId], references: [id])
+  significantOther Contact[] @relation("significant")
 }
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }

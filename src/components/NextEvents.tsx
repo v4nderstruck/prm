@@ -41,7 +41,7 @@ export default function NextEvents() {
           </thead>
           <tbody>
             {events.map((event) => (
-              <tr>
+              <tr key={event.id}>
                 <th>
                   <label>
                     <input type="checkbox" className="checkbox" />

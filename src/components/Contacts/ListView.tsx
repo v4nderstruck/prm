@@ -1,5 +1,6 @@
 "use client"
 import { faker } from '@faker-js/faker';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 type User = {
@@ -31,6 +32,7 @@ function fakeUsers() {
 
 export default function ListView() {
   const [users, setUsers] = useState<User[]>([])
+  const router = useRouter()
   useEffect(() => { setUsers(fakeUsers()) }, [])
   return (
     <div className="overflow-x-auto">
@@ -48,7 +50,10 @@ export default function ListView() {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
+            <tr
+              key={user.id}
+              onClick={() => {router.push(`/contacts/${user.id}`)}}
+                className = 'cursor-pointer' >
               <td>{user.id}</td>
               <td>
                 <div className="avatar">
@@ -64,8 +69,8 @@ export default function ListView() {
               <td>{user.tags}</td>
             </tr>
           ))}
-        </tbody>
-      </table>
-    </div>
+      </tbody>
+    </table>
+    </div >
   )
 }
