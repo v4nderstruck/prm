@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Channels {
+model Channel {
   id        String   @id @default(cuid())
   key       String
   value     String
@@ -33,21 +33,22 @@ model Note {
   portraitContact Contact?  @relation("portrait", fields: [portraitId], references: [id])
   activity        Activity?
   Tasks           Task?
-  Reminder        Reminder?
+  Reminder        Reminder? @relation(fields: [reminderId], references: [id])
+  reminderId      String?   @unique
 }
 
 model Like {
   id        String   @id @default(cuid())
-  key       String
-  reason    String
+  what      String
+  why       String
   Contact   Contact? @relation(fields: [contactId], references: [id])
   contactId Int?
 }
 
 model Dislike {
   id        String   @id @default(cuid())
-  key       String
-  reason    String
+  what      String
+  why       String
   Contact   Contact? @relation(fields: [contactId], references: [id])
   contactId Int?
 }
@@ -61,37 +62,39 @@ model Activity {
 }
 
 model Task {
-  id        String   @id @default(cuid())
-  Note      Note     @relation(fields: [noteId], references: [id])
-  noteId    String   @unique
-  Contact   Contact? @relation(fields: [contactId], references: [id])
+  id        String    @id @default(cuid())
+  reminder  Reminder?
+  Note      Note?     @relation(fields: [noteId], references: [id])
+  noteId    String    @unique
+  Contact   Contact?  @relation(fields: [contactId], references: [id])
   contactId Int?
 }
 
 model Reminder {
   id        String   @id @default(cuid())
   when      DateTime
-  note      Note     @relation(fields: [noteId], references: [id])
-  noteId    String   @unique
+  note      Note?
   Contact   Contact? @relation(fields: [contactId], references: [id])
   contactId Int?
+  Task      Task?     @relation(fields: [taskId], references: [id])
+  taskId    String?   @unique
 }
 
 model Tag {
   id        String   @id @default(cuid())
-  value     String
+  value     String   @unique
   Contact   Contact? @relation(fields: [contactId], references: [id])
   contactId Int?
 }
 
 model Contact {
-  id                   Int        @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
   name                 String
   birthday             DateTime?
   occupation           String?
   lastContacted        DateTime?
   lastActivityTogether DateTime?
-  channels             Channels[]
+  channels             Channel[]
   firstMet             String?
   firstMetDate         DateTime?
 
