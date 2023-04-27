@@ -1,8 +1,11 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import ContactView from "~/components/Contacts/ContactView";
 import Navbar from "~/components/Navbar";
 
 export default function Contact() {
+  const router = useRouter()
+  const { id } = router.query
   return (
     <>
       <Head>
@@ -13,7 +16,7 @@ export default function Contact() {
         <Navbar />
 
         <div className="px-0 lg:px-44 w-full flex flex-col gap-8 items-center">
-          <ContactView />
+          <ContactView id={parseInt(id as string)} />
         </div>
       </div>
     </>

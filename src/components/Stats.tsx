@@ -1,6 +1,10 @@
 import { AiOutlineAppstoreAdd } from 'react-icons/ai'
+import { api } from '~/utils/api';
 
 export default function Stats() {
+  const totalContacts = api.contacts.getTotalContacts.useQuery();
+  if(totalContacts.error || totalContacts.data === undefined) return <div></div>
+
   return (
     <div >
       <div className='mb-4'>
@@ -9,7 +13,7 @@ export default function Stats() {
       <div className="stats stats-vertical lg:stats-horizontal shadow overflow-x-scroll">
         <div className="stat">
           <div className="stat-title">Contacts</div>
-          <div className="stat-value">31K</div>
+          <div className="stat-value">{totalContacts.data}</div>
           <div className="stat-desc">Last Updated: Today</div>
         </div>
         <div className="stat">

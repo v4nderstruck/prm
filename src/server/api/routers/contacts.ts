@@ -3,6 +3,26 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
 
 export const contactsRouter = createTRPCRouter({
+  getTotalContacts: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.contact.count();
+  }),
+  getContactById: publicProcedure
+    .input(z.number())
+    .query(({ input, ctx }) => {
+      return ctx.prisma.contact.findUnique({
+        where: { id: input },
+        include: {
+          channels: true,
+          likes: true,
+          dislikes: true,
+          notes: true,
+          activities: true,
+          tasks: true,
+          reminders: true,
+          tags: true
+        }
+      })
+    }),
   getContactsByCursor: publicProcedure
     .input(z.object({
       take: z.number().min(1).max(100).nullish(),
@@ -13,7 +33,7 @@ export const contactsRouter = createTRPCRouter({
       const { cursor } = input;
 
       const items = await ctx.prisma.contact.findMany({
-        take: takeNum + 1 ,
+        take: takeNum + 1,
         cursor: cursor ? {
           id: cursor
         } : undefined,
