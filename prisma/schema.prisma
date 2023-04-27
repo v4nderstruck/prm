@@ -76,15 +76,14 @@ model Reminder {
   note      Note?
   Contact   Contact? @relation(fields: [contactId], references: [id])
   contactId Int?
-  Task      Task?     @relation(fields: [taskId], references: [id])
-  taskId    String?   @unique
+  Task      Task?    @relation(fields: [taskId], references: [id])
+  taskId    String?  @unique
 }
 
 model Tag {
-  id        String   @id @default(cuid())
-  value     String   @unique
-  Contact   Contact? @relation(fields: [contactId], references: [id])
-  contactId Int?
+  id      String    @id @default(cuid())
+  value   String    @unique
+  Contact Contact[]
 }
 
 model Contact {

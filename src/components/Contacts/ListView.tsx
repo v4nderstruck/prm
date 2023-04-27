@@ -1,76 +1,79 @@
 "use client"
-import { faker } from '@faker-js/faker';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { api } from '~/utils/api';
+import { useScrollPosition } from '../helpers/useScrollPosition';
 
-type User = {
-  id: number,
-  avatar: string,
-  name: string,
-  location: string,
-  lastContact: Date,
-  channels: string[],
-  tags: string[],
-
-}
-
-function fakeUsers() {
-  let users = []
-  for (let i = 0; i < 30; i++) {
-    users.push({
-      id: i,
-      avatar: faker.image.avatar(),
-      name: faker.name.findName(),
-      location: faker.address.cityName(),
-      lastContact: faker.date.past(),
-      channels: faker.helpers.arrayElements(['Email', 'Phone', 'SMS']),
-      tags: faker.helpers.arrayElements(['Blue', 'Green', 'Red', 'Yellow'])
-    })
-  }
-  return users
-}
 
 export default function ListView() {
-  const [users, setUsers] = useState<User[]>([])
   const router = useRouter()
-  useEffect(() => { setUsers(fakeUsers()) }, [])
+  const [cursor, setCursor] = useState<{ take: number }>({ take: 20 });
+  const contacts = api.contacts.getContactsByCursor.useInfiniteQuery({ take: 20 }, {
+    getNextPageParam: (lastPage) => lastPage.nextCursor
+    // keepPreviousData: true
+  });
+
+  const scrollCb = useCallback(
+    (percentage: number) => {
+      if (contacts.data === undefined) return;
+      if (contacts.data.pages.length < 1) return;
+      console.log("scrolled ", percentage);
+      console.log("hasNextPage ", contacts.hasNextPage);
+
+      if (percentage > 80 && contacts.hasNextPage) {
+        contacts.fetchNextPage()
+      }
+    },
+    [setCursor, contacts],
+  )
+
+  useScrollPosition(scrollCb, [contacts, setCursor], 300);
+
+  if (contacts.error || contacts.data === undefined) return <div></div>
+  if (contacts.isLoading) return <div>Loading...</div>
+
+  if (contacts.isRefetching) return <div>Refetching...</div>
+  console.log(contacts.data)
   return (
     <div className="overflow-x-auto">
-      <table className="table table-compact w-full">
+      <table
+        className="table table-compact w-full">
         <thead>
           <tr>
             <th></th>
             <th></th>
             <th>Name</th>
-            <th>Location</th>
+            <th>First Met</th>
             <th>Last Contact</th>
-            <th>Channels</th>
-            <th>Tags</th>
+            <th>Last Activity Together</th>
+            <th>Occupation</th>
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr
-              key={user.id}
-              onClick={() => {router.push(`/contacts/${user.id}`)}}
-                className = 'cursor-pointer' >
-              <td>{user.id}</td>
-              <td>
-                <div className="avatar">
-                  <div className="w-8 rounded-full">
-                    <img src={user.avatar} />
+          {contacts.data.pages.map(({ items }) => {
+            return items.map((user) => (
+              <tr
+                key={user.id}
+                onClick={() => { router.push(`/contacts/${user.id}`) }}
+                className='cursor-pointer' >
+                <td>{user.id}</td>
+                <td>
+                  <div className="avatar">
+                    <div className="w-8 rounded-full">
+                      <img src={user.avatar || ""} />
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>{user.name}</td>
-              <td>{user.location}</td>
-              <td>{user.lastContact.toLocaleDateString()}</td>
-              <td>{user.channels}</td>
-              <td>{user.tags}</td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
+                </td>
+                <td>{user.name}</td>
+                <td>{user.firstMet}</td>
+                <td>{user.lastContacted && user.lastContacted.toLocaleDateString()}</td>
+                <td>{user.lastActivityTogether && user.lastActivityTogether.toLocaleString()}</td>
+                <td>{user.occupation}</td>
+              </tr>
+            ))
+          })}
+        </tbody>
+      </table>
     </div >
   )
 }
